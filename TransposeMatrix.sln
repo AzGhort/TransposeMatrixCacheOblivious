@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2048
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TransposeMatrix", "TransposeMatrix\TransposeMatrix.vcxproj", "{0E58FEC5-B49C-4685-B8B7-38FCC91F9CB7}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0E58FEC5-B49C-4685-B8B7-38FCC91F9CB7}.Debug|x64.ActiveCfg = Debug|x64
+		{0E58FEC5-B49C-4685-B8B7-38FCC91F9CB7}.Debug|x64.Build.0 = Debug|x64
+		{0E58FEC5-B49C-4685-B8B7-38FCC91F9CB7}.Debug|x86.ActiveCfg = Debug|Win32
+		{0E58FEC5-B49C-4685-B8B7-38FCC91F9CB7}.Debug|x86.Build.0 = Debug|Win32
+		{0E58FEC5-B49C-4685-B8B7-38FCC91F9CB7}.Release|x64.ActiveCfg = Release|x64
+		{0E58FEC5-B49C-4685-B8B7-38FCC91F9CB7}.Release|x64.Build.0 = Release|x64
+		{0E58FEC5-B49C-4685-B8B7-38FCC91F9CB7}.Release|x86.ActiveCfg = Release|Win32
+		{0E58FEC5-B49C-4685-B8B7-38FCC91F9CB7}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F58BCFE6-D8F7-4E5B-BC93-88A95E07CA9B}
+	EndGlobalSection
+EndGlobal
