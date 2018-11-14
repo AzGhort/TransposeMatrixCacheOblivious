@@ -24,6 +24,9 @@
     <ClInclude Include="TransposeMatrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MatrixTester.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TransposeMatrix.cpp">
@@ -33,6 +36,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MatrixWriter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MatrixTester.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

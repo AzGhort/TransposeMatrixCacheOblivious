@@ -6,7 +6,9 @@ class MatrixTransposer
 		template <class T> void TransposeOnDiagonal(T* matrix, int side);
 		template <class T> void TransposeAndSwap(T* matrixA, T* matrixB, int side);
 		template <class T> void TransposeEdge(T* column, T* row, int side);
-
+		template <class T> void TransposeAndSwapTrivially(T* matrixA, T* matrixB, int side);
+		template <class T> void TransposeOnDiagonalTrivially(T* matrix, int side);
+		int trivialBound = 10;
 	private:
 		int columns;
 };
@@ -14,9 +16,9 @@ class MatrixTransposer
 template <class T> void MatrixTransposer::TransposeOnDiagonal(T* matrix, int side)
 {
 	// nothing to transpose
-	if (side <= 1)
+	if (side <= trivialBound)
 	{
-		return;
+		TransposeOnDiagonalTrivially(matrix, side);
 	}
 	else
 	{
@@ -45,12 +47,10 @@ template <class T> void MatrixTransposer::TransposeOnDiagonal(T* matrix, int sid
 
 template <class T> void MatrixTransposer::TransposeAndSwap(T* matrixA, T* matrixB, int side)
 {
-	if (side == 1)
+	if (side <= trivialBound)
 	// just swap whatever the pointers are pointing to 
 	{
-		T copy = *matrixA;
-		*matrixA = *matrixB;
-		*matrixB = copy;
+		TransposeAndSwapTrivially(matrixA, matrixB, side);
 	}
 	else
 	{
@@ -92,8 +92,43 @@ template <class T> void MatrixTransposer::TransposeEdge(T * column, T * row, int
 
 	for (int i = 0; i < side; i++)
 	{
-		TransposeAndSwap(colPtr, rowPtr, 1);
+		TransposeAndSwapTrivially(colPtr, rowPtr, 1);
 		rowPtr++;
 		colPtr += columns;
+	}
+}
+
+template<class T> void MatrixTransposer::TransposeAndSwapTrivially(T * matrixA, T * matrixB, int side)
+{
+	for (int i = 0; i < side; i++)
+	{
+		for (int j = 0; j < side; j++)
+		{
+			// copy = matrixA[i][j]
+			T copy = *(matrixA + i * side + j);
+			// matrixA[i][j] = matrixB[j][i]
+			*(matrixA + i * side + j) = *(matrixB + j * side + i);
+			// matrixB[j][i] = copy
+			*(matrixB + j * side + i) = copy;
+		}
+	}
+}
+
+template<class T> void MatrixTransposer::TransposeOnDiagonalTrivially(T * matrix, int side)
+{
+	for (int i = 0; i < side; i++)
+	{
+		for (int j = 0; j < side; j++)
+		{
+			if (j > i)
+			{
+				// copy = matrix[i][j]
+				T copy = *(matrix + i * side + j);
+				// matrix[i][j] = matrix[j][i]
+				*(matrix + i * side + j) = *(matrix + j * side + i);
+				// matrix[j][i] = copy
+				*(matrix + j * side + i) = copy;
+			}
+		}
 	}
 }

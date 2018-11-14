@@ -4,13 +4,12 @@ class MatrixWriter
 	public:
 		MatrixWriter(int col);
 		template <class T> void WriteMatrix(T *matrix);
-
+		
 	private:
 		int columns;
 };
 
-template<class T>
-inline void MatrixWriter::WriteMatrix(T *matrix)
+template<class T> void MatrixWriter::WriteMatrix(T *matrix)
 {
 	std::cout << "Matrix:\n";
 	for (int i = 0; i < (columns * columns); i++)
