@@ -1,4 +1,7 @@
 #pragma once
+/*
+	Auxiliary class, used for writing contents of given matrix.
+*/
 class MatrixWriter
 {
 	public:
@@ -9,6 +12,9 @@ class MatrixWriter
 		int columns;
 };
 
+/*
+	Writes given matrix to standard output.
+*/
 template<class T> void MatrixWriter::WriteMatrix(T *matrix)
 {
 	std::cout << "Matrix:\n";

@@ -1,134 +1,115 @@
 #pragma once
+#include <string>
+#include <iostream>
+
+/*
+	Class for matrix transposition.
+*/
 class MatrixTransposer
 {
 	public:
 		MatrixTransposer(int cols);
-		template <class T> void TransposeOnDiagonal(T* matrix, int side);
-		template <class T> void TransposeAndSwap(T* matrixA, T* matrixB, int side);
-		template <class T> void TransposeEdge(T* column, T* row, int side);
-		template <class T> void TransposeAndSwapTrivially(T* matrixA, T* matrixB, int side);
-		template <class T> void TransposeOnDiagonalTrivially(T* matrix, int side);
+
+		// actual transposition of matrix (actual PC speed test)
+		template <class T> void Transpose(T* matrix, int rows, int cols);
+		template <class T> void TransposeAndSwap(T* matrixA, T* matrixB, int rows, int col);
+		template <class T> void TransposeAndSwapTrivially(T* matrixA, T* matrixB, int rows, int col);
+		template <class T> void TransposeTrivially(T* matrix, int rows, int col);
+
+		// generating indices of transposed elements (ideal cache simulator input generating)
+		void SimulateTransposition(int side, bool trivial);
+		void GenerateTransposedElements(int row, int column, int side);
+		void GenerateTransposedElementsAndSwap(int rowA, int columnA, int rowB, int columnB, int rows, int cols);
+		void GenerateTransposedElementsAndSwapTrivially(int rowA, int columnA, int rowB, int columnB, int rows, int cols);
+		void GenerateTransposedElementsTrivially(int row, int column, int side);
+		
 		int trivialBound = 10;
+
 	private:
 		int columns;
 };
-
-template <class T> void MatrixTransposer::TransposeOnDiagonal(T* matrix, int side)
+ 
+#pragma region Actual transposition
+/*
+	Transposes given SQUARE matrix, dimensions determined by params rows and cols. Equivalent to TransposeOnDiagonal from the lecture.
+*/
+template <class T> void MatrixTransposer::Transpose(T* matrix, int rows, int cols)
 {
-	// nothing to transpose
-	if (side <= trivialBound)
+	// only square matrices, ergo rows == cols
+	if (rows <= trivialBound)
 	{
-		TransposeOnDiagonalTrivially(matrix, side);
+		TransposeTrivially(matrix, rows, cols);
 	}
 	else
 	{
-		// submatrices
-		int newside = (side / 2);
-		T* matrix11 = matrix;
-		T* matrix12 = matrix11 + newside;
-		T* matrix21 = matrix11 + columns * newside;
-		T* matrix22 = matrix21 + newside;
-
+		int newside = (rows / 2);
 		// transpose
-		TransposeOnDiagonal(matrix11, newside);
-		TransposeOnDiagonal(matrix22, newside);
-		TransposeAndSwap(matrix12, matrix21, newside);
-
-		// not the ideal case :( 
-		// swap the last column for last row
-		if (side % 2 == 1)
-		{
-			T* lastColumn = matrix + side - 1;
-			T* lastRow = matrix + columns * (side - 1);
-			TransposeEdge(lastColumn, lastRow, side - 1);
-		}
+		Transpose(matrix, newside, newside);
+		Transpose(matrix + columns*newside + newside, rows - newside, cols-newside);
+		TransposeAndSwap(matrix + newside, matrix + columns*newside, newside, cols - newside);
 	}
 }
 
-template <class T> void MatrixTransposer::TransposeAndSwap(T* matrixA, T* matrixB, int side)
+/*
+	Transposes and swaps two given matrices. Params ROWS and COLS refer to the matrixA, i.e. the upper-right submatrix.
+*/
+template <class T> void MatrixTransposer::TransposeAndSwap(T* matrixA, T* matrixB, int rows, int cols)
 {
-	if (side <= trivialBound)
-	// just swap whatever the pointers are pointing to 
+	// rows and cols refer to MATRIX A (e.g. rows are cols of matrixB and vice versa)
+	if (rows <= trivialBound && cols <= trivialBound)
 	{
-		TransposeAndSwapTrivially(matrixA, matrixB, side);
+		TransposeAndSwapTrivially(matrixA, matrixB, rows, cols);
 	}
 	else
 	{
 		// submatrices
-		int newside = (side / 2);
-		T* matrixA11 = matrixA;
-		T* matrixA12 = matrixA11 + newside;
-		T* matrixA21 = matrixA11 + columns * newside;
-		T* matrixA22 = matrixA21 + newside;
-		T* matrixB11 = matrixB;
-		T* matrixB12 = matrixB11 + newside;
-		T* matrixB21 = matrixB11 + columns * newside;
-		T* matrixB22 = matrixB21 + newside;
+		int newrows = (rows / 2);
+		int newcols = (cols / 2);
 
 		// transpose and swap them
-		TransposeAndSwap(matrixA11, matrixB11, newside);
-		TransposeAndSwap(matrixA12, matrixB21, newside);
-		TransposeAndSwap(matrixA21, matrixB12, newside);
-		TransposeAndSwap(matrixA22, matrixB22, newside);
-
-		// not the ideal case :( 
-		// swap the last column for last row
-		if (side % 2 == 1)
-		{
-			T* lastColumnA = matrixA + side - 1;
-			T* lastRowA = matrixA + columns * (side - 1);
-			T* lastColumnB = matrixB + side - 1;
-			T* lastRowB = matrixB + columns * (side - 1);
-			TransposeEdge(lastColumnA, lastRowB, side);
-			TransposeEdge(lastColumnB, lastRowA, side - 1);
-		}
+		TransposeAndSwap(matrixA, matrixB, newrows, newcols);
+		TransposeAndSwap(matrixA + newcols, matrixB + columns*newcols, newrows, cols - newcols);
+		TransposeAndSwap(matrixA + columns*newrows, matrixB + newrows, rows - newrows, newcols);
+		TransposeAndSwap(matrixA + columns*newrows + newcols, matrixB + columns*newcols + newrows, rows - newrows, cols - newcols);
 	}
 }
 
-template <class T> void MatrixTransposer::TransposeEdge(T * column, T * row, int side)
+/*
+	Transposes and swaps all elements from one matrix for another matrixA[i][j] = matrixB[j][i].Params ROWS and COLS refer to the matrixA, i.e. the upper-right submatrix. 
+*/
+template <class T> void MatrixTransposer::TransposeAndSwapTrivially(T * matrixA, T * matrixB, int rows, int col)
 {
-	T * colPtr = column;
-	T * rowPtr = row;
-
-	for (int i = 0; i < side; i++)
+	for (int i = 0; i < rows; i++)
 	{
-		TransposeAndSwapTrivially(colPtr, rowPtr, 1);
-		rowPtr++;
-		colPtr += columns;
-	}
-}
-
-template<class T> void MatrixTransposer::TransposeAndSwapTrivially(T * matrixA, T * matrixB, int side)
-{
-	for (int i = 0; i < side; i++)
-	{
-		for (int j = 0; j < side; j++)
+		for (int j = 0; j < col; j++)
 		{
 			// copy = matrixA[i][j]
-			T copy = *(matrixA + i * side + j);
+			T copy = *(matrixA + i * columns + j);
 			// matrixA[i][j] = matrixB[j][i]
-			*(matrixA + i * side + j) = *(matrixB + j * side + i);
+			*(matrixA + i * columns + j) = *(matrixB + j * columns + i);
 			// matrixB[j][i] = copy
-			*(matrixB + j * side + i) = copy;
+			*(matrixB + j * columns + i) = copy;
 		}
 	}
 }
 
-template<class T> void MatrixTransposer::TransposeOnDiagonalTrivially(T * matrix, int side)
+/*
+	Transposes given matrix trivially.
+*/
+template <class T> void MatrixTransposer::TransposeTrivially(T * matrix, int rows, int col)
 {
-	for (int i = 0; i < side; i++)
+	for (int i = 0; i < rows; i++)
 	{
-		for (int j = 0; j < side; j++)
+		for (int j = i + 1; j < col; j++)
 		{
-			if (j > i)
-			{
-				// copy = matrix[i][j]
-				T copy = *(matrix + i * side + j);
-				// matrix[i][j] = matrix[j][i]
-				*(matrix + i * side + j) = *(matrix + j * side + i);
-				// matrix[j][i] = copy
-				*(matrix + j * side + i) = copy;
-			}
+			// copy = matrixA[i][j]
+			T copy = *(matrix + i * columns + j);
+			// matrixA[i][j] = matrixB[j][i]
+			*(matrix + i * columns + j) = *(matrix + j * columns + i);
+			// matrixB[j][i] = copy
+			*(matrix + j * columns + i) = copy;
 		}
 	}
 }
+#pragma endregion
+
